@@ -4,23 +4,23 @@ import (
 	"context"
 	"log"
 
+	config "multiapi_golang/configs"
+
 	"cloud.google.com/go/datastore"
 )
 
 var client *datastore.Client
 var ctx context.Context
 
-// InitDatastore inicializa a conexão com o Google Datastore
-func InitDatastore(projectID string) {
+func InitDatastore() {
 	var err error
 	ctx = context.Background()
-	client, err = datastore.NewClient(ctx, projectID)
+	client, err = datastore.NewClient(ctx, config.AppConfig.Datastore.ProjectID)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 }
 
-// GetDatastoreClient retorna a instância única do cliente do Google Datastore
 func GetDatastoreClient() *datastore.Client {
 	return client
 }

@@ -1,22 +1,18 @@
 package repository
 
 import (
-	"internal/domain"
 	"log"
-	"pkg/db"
+	db "multiapi_golang/db"
+	domain "multiapi_golang/domain"
 )
 
-// LimitRepository lida com o acesso ao banco de dados para recuperar limites
 type LimitRepository struct{}
 
-// NewLimitRepository cria uma nova instância do LimitRepository
 func NewLimitRepository() *LimitRepository {
 	return &LimitRepository{}
 }
 
-// GetAll recupera todos os limites armazenados no banco de dados
 func (r *LimitRepository) GetAll() ([]*domain.Limit, error) {
-	// Usando a conexão singleton configurada no pkg/db
 	db := db.GetDB()
 	rows, err := db.Query("SELECT id, name, value FROM limits")
 	if err != nil {

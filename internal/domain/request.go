@@ -11,7 +11,6 @@ type Request struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-// NewRequest creates a new instance of Request
 func NewRequest(id int, description, status string) *Request {
 	return &Request{
 		ID:          id,
