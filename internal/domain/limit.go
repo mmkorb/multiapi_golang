@@ -8,7 +8,7 @@ import (
 // Limit representa um registro na tabela "limit"
 type Limit struct {
 	ID    int    `json:"id"`
-	Nome  string `json:"nome"`
+	Name  string `json:"name"`
 	Valor int    `json:"valor"`
 }
 

@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	config "multiapi_golang/configs"
@@ -13,11 +12,7 @@ import (
 var DB *sql.DB
 
 func InitDB() {
-	connStr := fmt.Sprintf("user=%s dbname=%s sslmode=disable",
-		config.AppConfig.DB.URI,
-		"mydb",
-	)
-
+	connStr := config.AppConfig.DB.URI
 	var err error
 	DB, err = sql.Open("postgres", connStr)
 	if err != nil {

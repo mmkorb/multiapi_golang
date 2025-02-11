@@ -19,7 +19,7 @@ func NewLimitRepository() *LimitRepository {
 
 // GetAll retorna todos os registros da tabela "limit"
 func (r *LimitRepository) GetAll() ([]domain.Limit, error) {
-	query := `SELECT id, nome, valor FROM limit`
+	query := `SELECT id, name, limite FROM limite`
 
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -31,7 +31,7 @@ func (r *LimitRepository) GetAll() ([]domain.Limit, error) {
 	var limits []domain.Limit
 	for rows.Next() {
 		var limit domain.Limit
-		if err := rows.Scan(&limit.ID, &limit.Nome, &limit.Valor); err != nil {
+		if err := rows.Scan(&limit.ID, &limit.Name, &limit.Valor); err != nil {
 			log.Printf("Erro ao escanear linha: %v", err)
 			return nil, err
 		}
@@ -48,9 +48,9 @@ func (r *LimitRepository) GetAll() ([]domain.Limit, error) {
 
 // Save insere um novo registro na tabela "limit"
 func (r *LimitRepository) Save(limit domain.Limit) error {
-	query := `INSERT INTO limit (nome, valor) VALUES ($1, $2) RETURNING id`
+	query := `INSERT INTO limite (name, limite) VALUES ($1, $2) RETURNING id`
 
-	err := r.db.QueryRow(query, limit.Nome, limit.Valor).Scan(&limit.ID)
+	err := r.db.QueryRow(query, limit.Name, limit.Valor).Scan(&limit.ID)
 	if err != nil {
 		log.Printf("Erro ao inserir limite: %v", err)
 		return err

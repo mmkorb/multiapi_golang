@@ -128,7 +128,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "nome": {
+                "name": {
                     "type": "string"
                 },
                 "valor": {
