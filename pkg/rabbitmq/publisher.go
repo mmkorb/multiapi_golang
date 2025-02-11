@@ -8,37 +8,55 @@ import (
 
 // Publisher é responsável por enviar mensagens para o RabbitMQ
 type Publisher struct {
-	Channel *amqp.Channel
-	Queue   amqp.Queue
+	Connection *amqp.Connection
+	Channel    *amqp.Channel
+	Queue      amqp.Queue
 }
 
-// NewPublisher cria uma nova instância do Publisher
-func NewPublisher(channel *amqp.Channel, queueName string) (*Publisher, error) {
-	// Declara a fila (se não existir)
-	queue, err := channel.QueueDeclare(
+func NewPublisher(rabbitURI, queueName string) (*Publisher, error) {
+	// Conecta ao RabbitMQ
+	conn, err := amqp.Dial(rabbitURI)
+	if err != nil {
+		log.Printf("Erro ao conectar ao RabbitMQ: %v", err)
+		return nil, err
+	}
+
+	// Abre um canal
+	ch, err := conn.Channel()
+	if err != nil {
+		log.Printf("Erro ao abrir canal no RabbitMQ: %v", err)
+		conn.Close()
+		return nil, err
+	}
+
+	// Declara a fila (caso não exista)
+	queue, err := ch.QueueDeclare(
 		queueName, // Nome da fila
 		true,      // Durável
-		false,     // Excluída quando o RabbitMQ for encerrado
+		false,     // Excluída ao encerrar RabbitMQ
 		false,     // Exclusiva
 		false,     // Sem auto-delete
 		nil,       // Argumentos
 	)
 	if err != nil {
-		log.Printf("Error declaring queue: %v", err)
+		log.Printf("Erro ao declarar a fila: %v", err)
+		ch.Close()
+		conn.Close()
 		return nil, err
 	}
 
 	return &Publisher{
-		Channel: channel,
-		Queue:   queue,
+		Connection: conn,
+		Channel:    ch,
+		Queue:      queue,
 	}, nil
 }
 
-// Publish envia uma mensagem para a fila do RabbitMQ
+// Publish envia uma mensagem para a fila
 func (p *Publisher) Publish(message string) error {
 	err := p.Channel.Publish(
-		"",           // Exchange
-		p.Queue.Name, // Fila
+		"",           // Exchange (vazio para usar a fila diretamente)
+		p.Queue.Name, // Routing Key (nome da fila)
 		false,        // Mandatory
 		false,        // Immediate
 		amqp.Publishing{
@@ -47,9 +65,17 @@ func (p *Publisher) Publish(message string) error {
 		},
 	)
 	if err != nil {
-		log.Printf("Error publishing message: %v", err)
-		return err
+		log.Printf("Erro ao publicar mensagem: %v", err)
 	}
-	log.Printf("Message sent: %s", message)
-	return nil
+	return err
+}
+
+// Close fecha a conexão e o canal do RabbitMQ
+func (p *Publisher) Close() {
+	if err := p.Channel.Close(); err != nil {
+		log.Printf("Erro ao fechar canal: %v", err)
+	}
+	if err := p.Connection.Close(); err != nil {
+		log.Printf("Erro ao fechar conexão: %v", err)
+	}
 }

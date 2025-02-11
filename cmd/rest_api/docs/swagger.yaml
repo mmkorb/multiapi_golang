@@ -1,4 +1,88 @@
+basePath: /
+definitions:
+  domain.Limit:
+    properties:
+      id:
+        type: integer
+      nome:
+        type: string
+      valor:
+        type: integer
+    type: object
+host: localhost:8080
 info:
   contact: {}
-paths: {}
+  description: API para gerenciamento de limites e integração com RabbitMQ
+  title: MultiAPI Golang
+  version: "1.0"
+paths:
+  /health:
+    get:
+      description: Retorna um status simples indicando que a API está rodando
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Verifica a saúde da API
+      tags:
+      - health
+  /limits:
+    get:
+      description: Obtém todos os registros da tabela "limit"
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Limit'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Retorna todos os limites cadastrados
+      tags:
+      - limits
+    post:
+      consumes:
+      - application/json
+      description: Insere um novo limite no banco de dados e publica no RabbitMQ
+      parameters:
+      - description: Dados do limite
+        in: body
+        name: limit
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Limit'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Limit'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cria um novo limite
+      tags:
+      - limits
 swagger: "2.0"

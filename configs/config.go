@@ -37,6 +37,5 @@ var AppConfig = &Config{
 	Datastore: DatastoreConfig{
 		ProjectID: "your-google-project-id",
 	},
-	PollingIntervalSeconds: 10,
-	EnableDatastore:        false,
+	EnableDatastore: false,
 }

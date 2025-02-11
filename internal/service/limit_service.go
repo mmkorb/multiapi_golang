@@ -1,23 +1,35 @@
 package service
 
 import (
-	"internal/domain"
-	"internal/repository"
+	"multiapi_golang/internal/domain"
+	"multiapi_golang/internal/repository"
+	"multiapi_golang/pkg/rabbitmq"
 )
 
-// LimitService is the service that handles the business logic for limits
+// LimitService representa o serviço de limites
 type LimitService struct {
-	Repository repository.LimitRepository
+	repo     *repository.LimitRepository
+	producer *rabbitmq.Publisher
 }
 
-// NewLimitService creates a new instance of LimitService
-func NewLimitService(repo repository.LimitRepository) *LimitService {
-	return &LimitService{
-		Repository: repo,
+// NewLimitService cria uma nova instância do serviço
+func NewLimitService(repo *repository.LimitRepository, producer *rabbitmq.Publisher) *LimitService {
+	return &LimitService{repo: repo, producer: producer}
+}
+
+// GetAllLimits retorna todos os registros da tabela "limit"
+func (s *LimitService) GetAllLimits() ([]domain.Limit, error) {
+	return s.repo.GetAll()
+}
+
+// CreateLimit insere um novo registro e publica no RabbitMQ
+func (s *LimitService) CreateLimit(limit domain.Limit) error {
+	// Salva no banco de dados
+	if err := s.repo.Save(limit); err != nil {
+		return err
 	}
-}
 
-// GetLimits returns all limits stored in the database
-func (s *LimitService) GetLimits() ([]*domain.Limit, error) {
-	return s.Repository.GetAll()
+	// Publica no RabbitMQ
+	err := s.producer.Publish(limit.ToString())
+	return err
 }
