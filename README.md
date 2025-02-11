@@ -2,7 +2,7 @@ Go Backend with RabbitMQ, REST API, and PostgreSQL
 This is a Go backend that supports sending and receiving messages via RabbitMQ, exposes a REST API documented with Swagger, and uses PostgreSQL as the database.
 
 📁 Project Structure
-
+'''
 📦 backend-project
 ├── 📂 cmd                  # Main applications
 │   ├── 📂 rabbitmq_consumer # RabbitMQ message consumer worker
@@ -20,6 +20,7 @@ This is a Go backend that supports sending and receiving messages via RabbitMQ, 
 ├── go.mod                  # Dependency management
 ├── go.sum                  # Dependency checksums
 ├── README.md               # Project documentation
+'''
 
 2️⃣ Database Setup
 The project uses PostgreSQL. To start the database using Docker, run:
